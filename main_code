@@ -40,15 +40,15 @@ class MainWidget(QMainWindow):
         # Также добавим базу данных для собственного словаря пользователя
         # и для истории переводов
         self.db_for_history = DataBase('history.csv')
-        self.db_for_ABC = DataBase('ownABC.csv')
+        self.db_for_ABC = DataBase('rez.csv')
         self.USER_TEXT = ''
         self.initUI()
 
     def initUI(self):
         # Зададим размер и положение нашего виджета, 
-        self.setGeometry(300, 300, 700, 300)
+        self.setGeometry(300, 300, 665, 300)
         # А также его заголовок
-        self.setWindowTitle('Вычисление выражений')
+        self.setWindowTitle('Diverse Translator')
 
         # Add a button & it setting
         # Создадим раскалдку (клавиатуру) на международном языке
@@ -195,6 +195,7 @@ class MainWidget(QMainWindow):
     # с английского в азбуку Морзе
     def click_translate_btn(self):
         text = self.input_show.text()
+        flag = True
         self.count = len(text)
         output_text = ''
         for letter in text:
@@ -202,14 +203,19 @@ class MainWidget(QMainWindow):
                 output_text += ' '
                 self.count -= 1
             elif letter.lower() not in words_morz_en:
-                error = QMessageBox.critical(self, 'ОШИБКА!', "Используйте только буквы!")
+                error = QMessageBox.critical(self, 'ОШИБКА!', "Используйте только буквы на\nанглийском!")
                 self.for_btn_clear()
                 self.count = 0
                 text = ''
+                flag = False
                 break
             else:
                 output_text += words_morz_en[letter.lower()]
                 self.output.setText(output_text)
+        if self.btn_change_keyboard.text() == 'Переключиться на\n раскладку' and flag:
+            self.db_for_history.append_data(text, output_text)
+        else:
+            self.db_for_history.append_data(text, 'error')
         self.counter.display(self.count)
 
     # Функция для имзенения собственного словаря пользователя
@@ -289,7 +295,7 @@ class MainWidget(QMainWindow):
     def check_language(self, word):
         letters = words_morz_ru.keys()
         for letter in word:
-            if letter not in letters:
+            if letter.lower() not in letters:
                 return False
         return True
 
@@ -329,8 +335,9 @@ class MainWidget(QMainWindow):
         symbols = self.output.text()
         letters = self.input_show.text()
         if letters and symbols:
-	    # Добавляем в БД истории перевод
-            self.db_for_history.append_data(letters, symbols)
+            if self.btn_change_keyboard.text() != 'Переключиться на\n раскладку':
+            # Добавляем в БД истории перевод
+                self.db_for_history.append_data(letters, symbols)
             self.output.setText('')
             self.input_show.setText('')
 	    # Счетчик обновим, чтобы он показывал нуль
@@ -441,7 +448,7 @@ class DataBase():
     def check_no_reply(self, symbol):
         reader = self.reader_file()
         for symboll in reader:
-          if symboll[1] == symbol:
+          if symboll[-1] == symbol:
             return False
         return True
 
@@ -473,14 +480,17 @@ class History(QWidget):
         self.initUI()
 
     def initUI(self):
-        self.setGeometry(300, 300, 700, 700)
+        self.setGeometry(300, 150, 420, 490)
         # А также его заголовок
         self.setWindowTitle('История')
 
         # Получаем всю историю и срезаем ее до 15-го элемента,чтобы история
         # умещалась в наше окно
         history = self.db.reader_file()
-        history = history[:15]
+        lengt = len(history)
+        if lengt >= 15:
+            history = history[lengt - 15:]
+        history = reversed(history)
         y = 5
 
         # Начинаем отображение истории переводов
@@ -488,7 +498,7 @@ class History(QWidget):
         for word, symbol in history:
           symbol_line = QLineEdit(self)
           symbol_line.setText(symbol)
-          symbol_line.resize(150, 20)
+          symbol_line.resize(130, 20)
           symbol_line.move(250, y)
           symbol_line.setReadOnly(True)
           word_label = QLabel(f'word:    {word}   |--->   ', self)
