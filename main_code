@@ -1,38 +1,36 @@
 import sys
 
 # Импортируем из PyQt5.QtWidgets классы для создания приложения и виджет
-from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QInputDialog, QMessageBox, QGridLayout
-from PyQt5.QtWidgets import QCheckBox, QLabel, QLineEdit, QLCDNumber, QTableView, QMainWindow, QScrollArea
-from PyQt5.QtGui import QPainter, QColor
-from PyQt5.QtSql import *
+from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QInputDialog, QMessageBox
+from PyQt5.QtWidgets import QLabel, QLineEdit, QLCDNumber, QMainWindow
 import csv
 
 # Константа-словарь, для превода английских слов (предложений)
 # в азубуку Морзе 
 words_morz_en = {'a': '.-', 'b': '-...', 'c': '-.-.', 'd': '-..',
-			  'e': '.', 'f': '..-.', 'g': '--.', 'h': '....',
-			  'i': '..', 'j': '.---', 'k': '-.-', 'l': '.-..',
-			  'm': '--', 'n': '-.', 'o': '---', 'p': '.--.',
-			  'q': '--.-', 'r': '.-.', 's': '...', 't': '-',
-			  'u': '..-', 'v': '...-', 'w': '.--', 'x': '-..-',
-			  'y': '-.--', 'z': '--..'}
+        'e': '.', 'f': '..-.', 'g': '--.', 'h': '....',
+        'i': '..', 'j': '.---', 'k': '-.-', 'l': '.-..',
+        'm': '--', 'n': '-.', 'o': '---', 'p': '.--.',
+        'q': '--.-', 'r': '.-.', 's': '...', 't': '-',
+        'u': '..-', 'v': '...-', 'w': '.--', 'x': '-..-',
+        'y': '-.--', 'z': '--..'}
 
 # Константа-словарь, для превода русских слов (предложений)
 # в азубуку Морзе
 words_morz_ru = {'а': '.-', 'б': '-...', 'в': '.--', 'г': '--.',
-				 'д': '-..', 'е': '.', 'ж': '...-', 'з': '--..',
-				 'и': '..', 'й': '.---', 'к': '-.-', 'л': '.-..',
-				 'м': '--', 'н': '-.', 'о': '---', 'п': '.--.',
-				 'р': '.-.', 'с': '...', 'т': '-', 'у': '..-',
-				 'ф': '..-.', 'х': '....', 'ц': '-.-.', 'ч': '---.',
-				 'ш': '----', 'щ': '--.-', 'ь': '-..-', 'ы': '-.--',
-				 'э': '..--..', 'ю': '..--', 'я': '.-.-', ' ': ' '}
+         'д': '-..', 'е': '.', 'ж': '...-', 'з': '--..',
+         'и': '..', 'й': '.---', 'к': '-.-', 'л': '.-..',
+         'м': '--', 'н': '-.', 'о': '---', 'п': '.--.',
+         'р': '.-.', 'с': '...', 'т': '-', 'у': '..-',
+         'ф': '..-.', 'х': '....', 'ц': '-.-.', 'ч': '---.',
+         'ш': '----', 'щ': '--.-', 'ь': '-..-', 'ы': '-.--',
+         'э': '..--..', 'ю': '..--', 'я': '.-.-', ' ': ' '}
 
 # Создадим список, в котором будем хранить нашу раскалдку.
 # С помощью этого списка будем скрывать или показывать раскладку
 BUTTONS = []
 
-# Отнаследуем наш класс от простейшего графического примитива QWidget
+# Отнаследуем наш класс от простейшего графического примитива QMainWindow
 class MainWidget(QMainWindow):
     def __init__(self):
         # Надо не забыть вызвать инициализатор базового класса
@@ -57,24 +55,24 @@ class MainWidget(QMainWindow):
         key_words = words_morz_en.keys()
         x, y = 5, 5
         for i in key_words:
-        	o = QPushButton(i, self)
-        	o.resize(30, 30)
-        	o.move(x, y)
-        	o.clicked.connect(self.click)
-        	x += 25
-        	BUTTONS.append(o)
+          o = QPushButton(i, self)
+          o.resize(30, 30)
+          o.move(x, y)
+          o.clicked.connect(self.click)
+          x += 25
+          BUTTONS.append(o)
 
         # Создадим кнопки, с помоью которых будем отправлять тот или иной сигнал
 
         # ----------------------------------------------------------------------
         
         # Кнопка для изменения нашего словаря  
-       	btn_change_abc = QPushButton('Изменить', self)
-       	btn_change_abc.resize(100, 20)
-       	btn_change_abc.move(490, 175)
-       	btn_change_abc.clicked.connect(self.change_own_ABC)
+        btn_change_abc = QPushButton('Изменить', self)
+        btn_change_abc.resize(100, 20)
+        btn_change_abc.move(490, 175)
+        btn_change_abc.clicked.connect(self.change_own_ABC)
 
-       	# Кнопка для создания (добавления) собственного словаря
+        # Кнопка для создания (добавления) собственного словаря
         btn_create_alfpabet = QPushButton('Создать', self)
         btn_create_alfpabet.resize(100, 20)
         btn_create_alfpabet.move(380, 175)
@@ -123,71 +121,72 @@ class MainWidget(QMainWindow):
         self.btn_change_keyboard.move(230, y + 96)
         self.btn_change_keyboard.clicked.connect(self.change_keyboard)
 
+	# Если пользователь захочет отчистить свой словарь, то дадим эту возможность
         btn_clear_data_own_ABC = QPushButton('Очистить данные словаря', self)
         btn_clear_data_own_ABC.resize(211, 25)
         btn_clear_data_own_ABC.move(379, 239)
         btn_clear_data_own_ABC.clicked.connect(self.clear_data_own_ABC)
 
 
-       	# Создадим поля для ввода пользователя и поля для 
-       	# вывода переводов
+        # Создадим поля для ввода пользователя и поля для 
+        # вывода переводов
 
-       	# -----------------------------------------------
+        # -----------------------------------------------
 
-       	# Поле для ввода пользователя (английский язык)
-       	self.input_show = QLineEdit(self)
-       	self.input_show.resize(220, 30)
-       	self.input_show.move(5, y + 65)
-       	self.input_show.setReadOnly(True)
+        # Поле для ввода пользователя (английский язык)
+        self.input_show = QLineEdit(self)
+        self.input_show.resize(220, 30)
+        self.input_show.move(5, y + 65)
+        self.input_show.setReadOnly(True)
 
-       	# Поле для вывода введенного предложения (слова) пользователя
-       	# Также сделаем его невозможным для изменений (английский язык)
-       	self.output = QLineEdit(self)
-       	self.output.resize(220, 30)
-       	self.output.move(5, y + 95) 
-       	self.output.setReadOnly(True)
+        # Поле для вывода введенного предложения (слова) пользователя
+        # Также сделаем его невозможным для изменений (английский язык)
+        self.output = QLineEdit(self)
+        self.output.resize(220, 30)
+        self.output.move(5, y + 95) 
+        self.output.setReadOnly(True)
 
-       	# Поле для отображения введенного предложения (слова) на русском
-       	self.russian_word = QLineEdit(self)
-       	self.russian_word.resize(150, 20)
-       	self.russian_word.move(135, 186)
-       	self.russian_word.setReadOnly(True)
+        # Поле для отображения введенного предложения (слова) на русском
+        self.russian_word = QLineEdit(self)
+        self.russian_word.resize(150, 20)
+        self.russian_word.move(135, 186)
+        self.russian_word.setReadOnly(True)
 
-       	# Поле для отображения введенного предложения (слова) в азубке Морзе
-       	self.translation_from_russian = QLineEdit(self)
-       	self.translation_from_russian.resize(150, 20)
-       	self.translation_from_russian.move(135, 205)
-       	self.translation_from_russian.setReadOnly(True)
+        # Поле для отображения введенного предложения (слова) в азубке Морзе
+        self.translation_from_russian = QLineEdit(self)
+        self.translation_from_russian.resize(150, 20)
+        self.translation_from_russian.move(135, 205)
+        self.translation_from_russian.setReadOnly(True)
 
-       	# Поле для перевода на собственный словарт введенного слова(предложения)
-       	self.input_own_ABC = QLineEdit(self)
-       	self.input_own_ABC.resize(150, 20)
-       	self.input_own_ABC.move(380, 197)
+        # Поле для перевода на собственный словарт введенного слова(предложения)
+        self.input_own_ABC = QLineEdit(self)
+        self.input_own_ABC.resize(150, 20)
+        self.input_own_ABC.move(380, 197)
 
-       	# Поле для вывода переведенного слова(предложения) на собственный словарь
-       	self.output_own_ABC = QLineEdit(self)
-       	self.output_own_ABC.resize(150, 20)
-       	self.output_own_ABC.move(380, 217)
-       	self.output_own_ABC.setReadOnly(True)
+        # Поле для вывода переведенного слова(предложения) на собственный словарь
+        self.output_own_ABC = QLineEdit(self)
+        self.output_own_ABC.resize(150, 20)
+        self.output_own_ABC.move(380, 217)
+        self.output_own_ABC.setReadOnly(True)
 
-       	# Добавим счетчик, отслеживающий количесвто введенных букв
-       	# --------------------------------------------------------
-       	# на английской раскладке, которую мы добавляли
-       	self.count = 0
-       	self.counter = QLCDNumber(self)
-       	self.counter.resize(200, 50)
-       	self.counter.move(460, y + 65)
+        # Добавим счетчик, отслеживающий количесвто введенных букв
+        # --------------------------------------------------------
+        # на английской раскладке, которую мы добавляли
+        self.count = 0
+        self.counter = QLCDNumber(self)
+        self.counter.resize(200, 50)
+        self.counter.move(460, y + 65)
 
-       	# Создадим Лейблы с говорящими надписями для ориентировки на виджете
-       	label_your_abc = QLabel('Ваш словарь:', self)
-       	label_your_abc.move(455, 150)
+        # Создадим Лейблы с говорящими надписями для ориентировки на виджете
+        label_your_abc = QLabel('Ваш словарь:', self)
+        label_your_abc.move(455, 150)
 
-       	label_letters = QLabel('Letters: ', self)
-       	label_letters.move(480, 70)
+        label_letters = QLabel('Letters: ', self)
+        label_letters.move(480, 70)
 
-       	self.label_for_info_keyboard = QLabel('Вы используете\nклавиатуру!', self)
-       	self.label_for_info_keyboard.move(275, 20)
-       	self.label_for_info_keyboard.hide()
+        self.label_for_info_keyboard = QLabel('Вы используете\nклавиатуру!', self)
+        self.label_for_info_keyboard.move(275, 20)
+        self.label_for_info_keyboard.hide()
 
 
     # Создадим функции, которые будут срабатывать после нажатия на ту или иную кнопку
@@ -196,10 +195,12 @@ class MainWidget(QMainWindow):
     # с английского в азбуку Морзе
     def click_translate_btn(self):
         text = self.input_show.text()
+        self.count = len(text)
         output_text = ''
         for letter in text:
             if letter == ' ':
                 output_text += ' '
+                self.count -= 1
             elif letter.lower() not in words_morz_en:
                 error = QMessageBox.critical(self, 'ОШИБКА!', "Используйте только буквы!")
                 self.for_btn_clear()
@@ -207,35 +208,34 @@ class MainWidget(QMainWindow):
                 text = ''
                 break
             else:
-                self.count += 1
                 output_text += words_morz_en[letter.lower()]
                 self.output.setText(output_text)
         self.counter.display(self.count)
 
     # Функция для имзенения собственного словаря пользователя
     def change_own_ABC(self):
-    	# При нажатии "Изменить" вызовем диалоговое окно, которая будет запрашивать букву,
-    	# у которой пользователь хочет изменить символ
+      # При нажатии "Изменить" вызовем диалоговое окно, которая будет запрашивать букву,
+      # у которой пользователь хочет изменить символ
         letter, ok_pressed = QInputDialog.getText(self, 'Cheange Own ABC', 'Letter:')
         # После нажатия "ОК" в диалоговм окне вызовем еще одно
         # диалоговое окно для запращивания нового символа, которое будет обозначать ту или иную букву
         if ok_pressed:
             symbol, ok_pressed1 = QInputDialog.getText(self, 'Own ABC', 'Symbol:')
             if ok_pressed1:
-            	# Проверим, есть ли такая буква в словаре
-            	# чтобы мы могла ее изменить
+              # Проверим, есть ли такая буква в словаре
+              # чтобы мы могла ее изменить
                 if self.db_for_ABC.check_in_ABC_letter(letter):
-                	# Не нашлась такая буква - Выведем окно с ошибкой
+                  # Не нашлась такая буква - Выведем окно с ошибкой
                     error = QMessageBox.critical(self, 'ОШИБКА!', f'Letter: {letter}\nТакой буквы нет в вашем словаре!')
                 # Проверим также, не принадлежит ли символ, который мы хотим присвоить букве, другой букве
                 elif not self.db_for_ABC.check_no_reply(symbol):
-                	# Принадлежит - Выводим ошибку
-                	error = QMessageBox.critical(self, 'ОШИБКА!', f'Symbol: {symbols}\nТакой символ уже присвоен другой букве!')
+                  # Принадлежит - Выводим ошибку
+                  error = QMessageBox.critical(self, 'ОШИБКА!', f'Symbol: {symbol}\nТакой символ уже присвоен другой букве!')
                 else:
-                	# Введенный символ не присвоен другим буквам и буква есть 
-                	# в словаре пользователя, тогда
-                	# изменим символ введенной буквы на новый
-                	self.db_for_ABC.change_letter(letter, symbol)
+                  # Введенный символ не присвоен другим буквам и буква есть 
+                  # в словаре пользователя, тогда
+                  # изменим символ введенной буквы на новый
+                  self.db_for_ABC.change_letter(letter, symbol)
 
     # Функция, вызывающая новое окно, в котором будет отображаться история переводов
     def show_history(self):
@@ -244,41 +244,48 @@ class MainWidget(QMainWindow):
 
     # Создадим функцию для добавления "новая буква - символ" в собаственный словарь пользователя
     def append_in_own_ABC(self):
-    	# Так же запросим букву и символ для буквы, как в функции change_own_ABC()
+      # Так же запросим букву и символ для буквы, как в функции change_own_ABC()
         letter, ok_pressed = QInputDialog.getText(self, 'Creating own ABC', 'letter:')
         if ok_pressed:
             symbol, ok_pressed1 = QInputDialog.getText(self, 'Own ABC', 'Symbol:')
             if ok_pressed1:
-            	# Проверим, добавляет ползователь новую букву или уже существующую
+              # Проверим, добавляет ползователь новую букву или уже существующую
                 if not self.db_for_ABC.check_in_ABC_letter(letter):
-                	# Если существующую - выведем ошибку
+                  # Если существующую - выведем ошибку
                     error = QMessageBox.critical(self, 'ОШИБКА!', f'Letter: {letter}\nУже есть в списке. Используйте кнопку "Изменить"')
                 elif not self.db_for_ABC.check_no_reply(symbol):
-                	# Символ для буквы уже существует - Выводим ошибку
-                	error = QMessageBox.critical(self, 'ОШИБКА!', f'Symbol: {symbols}\nТакой символ уже присвоен другой букве!')
+                  # Символ для буквы уже существует - Выводим ошибку
+                  error = QMessageBox.critical(self, 'ОШИБКА!', f'Symbol: {symbol}\nТакой символ уже присвоен другой букве!')
                 else:
-                	# Все прошло успешно - добавляем в нашу базу данных "буква;символ"
+                  # Все прошло успешно - добавляем в нашу базу данных "буква;символ"
                     self.db_for_ABC.append_data(letter, symbol)
 
+    # Перевод слов на русский с помощью QInputDialog
+    # Выведем окно, где пользователь введет слово на русском
     def on_russia_dialog(self):
         word, ok_pressed = QInputDialog.getText(self, 'Russia', 'Russian word:')
 
         if ok_pressed:
+	    # Проверим, все ли буквы на русском
             if self.check_language(word):
                 self.russian_word.setText(word)
                 text = ''
                 for i in word:
+		    # Проверка на пробел
                     if i == ' ':
                         text += ' '
                     else:
                         text += words_morz_ru[i.lower()]
                         self.translation_from_russian.setText(text)
+		# Добавим перевод с БД истории
                 self.db_for_history.append_data(word, text)
             else:
+	        # Иначе, если не все буквы на русском, покажем в поле слово "error" и доавим в БД истории error
                 self.russian_word.setText('Error')
                 self.translation_from_russian.setText('')
                 self.db_for_history.append_data(word, 'error')
 
+    # Функция для проверки букв на русскую раскалдку
     def check_language(self, word):
         letters = words_morz_ru.keys()
         for letter in word:
@@ -288,67 +295,79 @@ class MainWidget(QMainWindow):
 
     # Создадим функцию и свяжем ее с кнопкой перевода self.output_own_ABC
     def for_btn_translate_own_ABC(self):
+      # Получаем введенный в поле текст пользователя
       text_from_line = self.input_own_ABC.text()
+      # Получаем буквы словаря для проверок
       letters = self.db_for_ABC.letters_in_ABC()
+      # Получаем словарь (буква: символ) для удобного перевода
       dict_own_ABC = self.db_for_ABC.return_dict_ABC()
       text_output = ''
+      # Зададим flag = True для добавления в БД истории результат: ошибку первода или успешный перевод
+      flag = True
 
       for letter in text_from_line:
           if letter == ' ':
               text_output += ' '
           elif letter not in letters:
+	      # Нет какой-либо введенной буквы в БД словаря пользователя - выводим ошибку и flag = False
               error = QMessageBox.critical(self, 'ОШИБКА!', f"Letter: {letter}\nТакой буквы нет в вашем списке.\nЧтобы добавить ее, нажмите кнопку 'Добавить'")
               self.output_own_ABC.setText('error')
+              flag = False
               break
           else:
               text_output += dict_own_ABC[letter]
       self.output_own_ABC.setText(text_output)
-      self.db_for_history.append_data(text_from_line, 'error')
 
-    	# ДОДЕЛАТЬ!!!
+      if flag:
+          self.db_for_history.append_data(text_from_line, text_output)
+      else:
+          self.db_for_history.append_data(text_from_line, 'error')
 
+    # Зададим функцию для очищения поля ввода английских слов
     def for_btn_clear(self):
+        # Очищаем поля
         symbols = self.output.text()
         letters = self.input_show.text()
         if letters and symbols:
+	    # Добавляем в БД истории перевод
             self.db_for_history.append_data(letters, symbols)
             self.output.setText('')
             self.input_show.setText('')
+	    # Счетчик обновим, чтобы он показывал нуль
             self.count = 0
             self.counter.display(self.count)
 
     def click(self):
-   	    letter_from_btn = self.sender().text()
-   	    text = self.input_show.text()
-   	    text_in_line = self.output.text()
-   	    if letter_from_btn == 'SPACE':
-   	    	letter = ' '
-   	    else:
-   	    	self.count += 1
-   	    	letter = words_morz_en[letter_from_btn]
-   	    	self.output.setText(text_in_line + letter)
-   	    	self.input_show.setText(text + letter_from_btn)
-   	    self.counter.display(self.count)
-
-   	    # разобраться с self.USER_TEXT
+        letter_from_btn = self.sender().text()
+        text = self.input_show.text()
+        text_in_line = self.output.text()
+        if letter_from_btn == 'SPACE':
+            letter = ' '
+            self.input_show.setText(text + ' ')
+        else:
+            self.count += 1
+            letter = words_morz_en[letter_from_btn]
+            self.input_show.setText(text + letter_from_btn)
+        self.output.setText(text_in_line + letter)
+        self.counter.display(self.count)
 
     def change_keyboard(self):
-   	    text_from_btn = self.btn_change_keyboard.text()
-   	    if text_from_btn == 'Переключиться на\n клавиатуру':
-   	        for btn in BUTTONS:
-   	            btn.hide()
-   	        self.btn_space.hide()
-   	        self.label_for_info_keyboard.show()
-   	        self.btn_change_keyboard.setText('Переключиться на\n раскладку')
-   	        self.input_show.setReadOnly(False)
+        text_from_btn = self.btn_change_keyboard.text()
+        if text_from_btn == 'Переключиться на\n клавиатуру':
+            for btn in BUTTONS:
+                btn.hide()
+            self.btn_space.hide()
+            self.label_for_info_keyboard.show()
+            self.btn_change_keyboard.setText('Переключиться на\n раскладку')
+            self.input_show.setReadOnly(False)
 
-   	    if text_from_btn == 'Переключиться на\n раскладку':
-   	        for btn in BUTTONS:
-   	            btn.show()
-   	        self.btn_space.show()
-   	        self.label_for_info_keyboard.hide()
-   	        self.btn_change_keyboard.setText('Переключиться на\n клавиатуру')
-   	        self.input_show.setReadOnly(True)
+        if text_from_btn == 'Переключиться на\n раскладку':
+            for btn in BUTTONS:
+                btn.show()
+            self.btn_space.show()
+            self.label_for_info_keyboard.hide()
+            self.btn_change_keyboard.setText('Переключиться на\n клавиатуру')
+            self.input_show.setReadOnly(True)
 
     def clear_data_own_ABC(self):
         self.db_for_ABC.clear_db()
@@ -362,8 +381,8 @@ class MainWidget(QMainWindow):
 # Создадим класс для работы с базой данных
 class DataBase():
     def __init__(self, path):
-    	# Иницилизируем путь к файлу, где будет происходить
-    	# работа с БД
+      # Иницилизируем путь к файлу, где будет происходить
+      # работа с БД
         self.path = path
 
     # Создадим функцию, которая будет возращать данные из БД в виде списка
@@ -378,11 +397,11 @@ class DataBase():
 
     # Создадим функцию, которая будет нам возращать все буквы словаря пользователя
     def letters_in_ABC(self):
-    	reader = self.reader_file()
-    	letters = []
-    	for read in reader:
-    		letters.append(read[0])
-    	return letters
+      reader = self.reader_file()
+      letters = []
+      for read in reader:
+        letters.append(read[0])
+      return letters
 
     # Фунция, возвращающая список символов в словаре
     def symbols_in_ABC(self):
@@ -394,9 +413,9 @@ class DataBase():
 
     # Функция, которая добавлят данные в csv файл
     def append_data(self, word, translation):
-    	with open(self.path, 'a', newline='', encoding='utf8') as csvfile:
-    		writer = csv.writer(csvfile, delimiter=';', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-    		writer.writerow([word, translation])
+      with open(self.path, 'a', newline='', encoding='utf8') as csvfile:
+        writer = csv.writer(csvfile, delimiter=';', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+        writer.writerow([word, translation])
 
     # Создадим функцию, с помощью которой будем менять словарь пользователя
     def change_letter(self, letter, symbol):
@@ -412,7 +431,7 @@ class DataBase():
                 letter = read[0]
                 symbol = read[1]
                 writer.writerow([letter, symbol])
-    				
+            
     # Создадим функцию, которая будет отчищать БД
     def clear_db(self):
         file = open(self.path, 'w')
@@ -421,9 +440,9 @@ class DataBase():
     # Создадим функцию для проверки наличия символов в словаре пользователя
     def check_no_reply(self, symbol):
         reader = self.reader_file()
-        for symbol in reader:
-        	if symbol[1] == symbol:
-        		return False
+        for symboll in reader:
+          if symboll[1] == symbol:
+            return False
         return True
 
     # Функция, возвращающая нам словарь, где ключ - буквы, значение - символ буквы
@@ -470,7 +489,7 @@ class History(QWidget):
           symbol_line = QLineEdit(self)
           symbol_line.setText(symbol)
           symbol_line.resize(150, 20)
-          symbol_line.move(150, y)
+          symbol_line.move(250, y)
           symbol_line.setReadOnly(True)
           word_label = QLabel(f'word:    {word}   |--->   ', self)
           word_label.move(5, y)
@@ -478,7 +497,7 @@ class History(QWidget):
 
         # Также добавим кнопку для отчистки истории
         # (Вдруг пользователь имеет секреты)
-       	btn_clear = QPushButton('Clear History', self)
+        btn_clear = QPushButton('Clear History', self)
         btn_clear.resize(100, 30)
         btn_clear.move(5, y)
         btn_clear.clicked.connect(self.clicked_clear)
